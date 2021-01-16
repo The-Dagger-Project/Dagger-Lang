@@ -4,7 +4,7 @@ Dagger is a homoiconic, interpreted programming language designed to be fast and
 # Installation
 Currently, Dagger is available only as an interactive prompt (we're hoping to make it include external files in future commits). First of all, clone this repo:
 ```bash
-git clone https://github.com/The-Dagger-Project/Dagger-Lang
+git clone https://github.com/The-Dagger-Project/Dagger-Lang.git
 ```
 You must have the editline library installed, follow installation steps from their [repo](https://github.com/troglobit/editline) <br>
 After installing the library, run the following command to link it and compile:
