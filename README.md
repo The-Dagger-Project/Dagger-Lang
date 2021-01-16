@@ -6,7 +6,7 @@ Currently, Dagger is available only as an interactive prompt (we're hoping to ma
 ```bash
 git clone http://github.com/https://github.com/The-Dagger-Project/Dagger-Lang
 ```
-You must have the editline library installed, follow installation steps from their (repo)[https://github.com/troglobit/editline] <br>
+You must have the editline library installed, follow installation steps from their [repo](https://github.com/troglobit/editline) <br>
 After installing the library, run the following command to link it and compile:
 ```bash
 ./make.sh
