@@ -4,6 +4,7 @@
 
 #ifdef _WIN32
 
+
 static char buffer[2048];
 
 char* readline(char* prompt) {
@@ -20,6 +21,8 @@ void add_history(char* unused) {}
 #else
 #include <editline.h>
 #endif
+
+#define BUFFER (512)
 
 /* Parser Declariations */
 
@@ -216,13 +219,25 @@ lval* lval_add(lval* v, lval* x) {
   return v;
 }
 
-lval* lval_join(lval* x, lval* y) {  
-  for (int i = 0; i < y->count; i++) {
-    x = lval_add(x, y->cell[i]);
-  }
-  free(y->cell);
-  free(y);  
-  return x;
+lval* lval_join(lval* x, lval* y) {
+    /* For strings */
+    if ((x->type == LVAL_STR) & (y->type == LVAL_STR)) {
+        char str[BUFFER];
+        strcpy(str, x->str);
+        strcat(str, y->str);
+
+        lval_del(x); lval_del(y);
+        return lval_str(str);
+    }
+
+    /* For each cell in 'y' add it to 'x' */
+    for (int i = 0; i < y->count; i++) {
+        x = lval_add(x, y->cell[i]);
+    }
+
+    /* Delete the empty 'y' and return 'x' */
+    free(y->cell); free(y);
+    return x;
 }
 
 lval* lval_pop(lval* v, int i) {
@@ -452,24 +467,48 @@ lval* builtin_list(lenv* e, lval* a) {
 
 lval* builtin_head(lenv* e, lval* a) {
   LASSERT_NUM("head", a, 1);
-  LASSERT_TYPE("head", a, 0, LVAL_QEXPR);
   LASSERT_NOT_EMPTY("head", a, 0);
   
-  lval* v = lval_take(a, 0);  
-  while (v->count > 1) { lval_del(lval_pop(v, 1)); }
-  return v;
+  if (a->cell[0]->type == LVAL_QEXPR) {
+      lval* v = lval_take(a, 0);
+      while (v->count > 1) { lval_del(lval_pop(v, 1)); }
+      return v;
+  } else if (a->cell[0]->type == LVAL_STR) {
+      char num = (a->cell[0]->str)[0];
+      char letter[1];
+      letter[0] = (char)num;
+      lval_del(a); 
+      return lval_str(letter);
+  }
+
+    lval_del(a);
+    return lval_err("Function 'head' expected a String or a Q-expression");
 }
 
 lval* builtin_tail(lenv* e, lval* a) {
-  LASSERT_NUM("tail", a, 1);
-  LASSERT_TYPE("tail", a, 0, LVAL_QEXPR);
-  LASSERT_NOT_EMPTY("tail", a, 0);
+    LASSERT_NUM("tail", a, 1);
+    LASSERT_NOT_EMPTY("tail", a, 0);
 
-  lval* v = lval_take(a, 0);  
-  lval_del(lval_pop(v, 0));
-  return v;
+    if (a->cell[0]->type == LVAL_QEXPR) {
+        lval* v = lval_take(a, 0);
+        lval_del(lval_pop(v, 0));
+        return v;
+    }
+    /* remove only first character for strings */
+    else if (a->cell[0]->type == LVAL_STR) {
+        char* s = (a->cell[0]->str);
+        char text[strlen(s)];
+        int i;
+
+        for (i = 0; s[i+1] != '\0'; ++i) { text[i] = s[i+1]; }
+        text[i] = '\0';
+
+        lval_del(a); return lval_str(text);
+    }
+
+    lval_del(a);
+    return lval_err("Function 'tail' expected a String or a Q-expression");
 }
-
 lval* builtin_eval(lenv* e, lval* a) {
   LASSERT_NUM("eval", a, 1);
   LASSERT_TYPE("eval", a, 0, LVAL_QEXPR);
@@ -480,20 +519,23 @@ lval* builtin_eval(lenv* e, lval* a) {
 }
 
 lval* builtin_join(lenv* e, lval* a) {
-  
-  for (int i = 0; i < a->count; i++) {
-    LASSERT_TYPE("join", a, i, LVAL_QEXPR);
-  }
-  
-  lval* x = lval_pop(a, 0);
-  
-  while (a->count) {
-    lval* y = lval_pop(a, 0);
-    x = lval_join(x, y);
-  }
-  
-  lval_del(a);
-  return x;
+
+    if (a->cell[0]->type == LVAL_QEXPR) {
+        for (int i = 0; i < a->count; i++) {
+            LASSERT_TYPE("join", a, i, LVAL_QEXPR);
+        }
+    } else {
+        for (int i = 0; i < a->count; i++) {
+            LASSERT_TYPE("join", a, i, LVAL_STR);
+        }
+    }
+
+    lval* x = lval_pop(a, 0);
+    while (a->count) {
+        x = lval_join(x, lval_pop(a, 0));
+    }
+
+    lval_del(a); return x;
 }
 
 lval* builtin_op(lenv* e, lval* a, char* op) {
@@ -695,7 +737,7 @@ void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
 void lenv_add_builtins(lenv* e) {
   /* Variable Functions */
   lenv_add_builtin(e, "\\",  builtin_lambda); 
-  lenv_add_builtin(e, "def", builtin_def);
+  lenv_add_builtin(e, "set", builtin_def);
   lenv_add_builtin(e, "=",   builtin_put);
   
   /* List Functions */
@@ -906,7 +948,7 @@ int main(int argc, char** argv) {
   /* Interactive Prompt */
   if (argc == 1) {
   
-    puts("Dagger Version 0.0.0.1.2");
+    puts("Dagger Version 0.0.0.1.3");
     puts("Press Ctrl+c to Exit\n");
   
     while (1) {

@@ -1,1 +1,4 @@
+(load "std.dgr")
+
 (print "Hello World")
+(print (eval {not 1}))

@@ -1,0 +1,49 @@
+;;; Key Values
+
+(set {null} {})
+(set {true} 1)
+(set {false} 0)
+
+;;; Functions
+
+(set {fun} (\ {args body} {set (head args) (\ (tail args) body)}))
+
+;;; Logic Functions
+
+(fun {not x} {- 0 x}) 
+(fun {or x y} {+ x y})
+(fun {and x y} {* x y})
+
+;;; List Ops
+
+;; First list item
+(fun {first l} { eval (head l) })
+
+;; Second list item
+(fun {second l} { eval (head (tail l)) })
+
+;; Third list item
+(fun {third l} { eval (head (tail (tail l))) })
+
+;; Nth list item (starts from 0)
+(fun {nth n l} {
+    if (== n 0)
+        {first l}
+        {nth (- n 1) (tail l)}
+})
+
+;; Take n list items
+(fun {take n l} {
+  if (== n 0)
+    {nil}
+    {join (head l) (take (- n 1) (tail l))}
+})
+
+;; Check if element is in list
+(fun {elem x l} {
+    if (== l null)
+        {false}
+        {if (== x (first l)) 
+            {true} 
+            {elem x (tail l)}}
+})
