@@ -66,6 +66,13 @@ struct lval {
   lval** cell;
 };
 
+double pow(double x, double y) {
+  if (y == 0) return 1;
+  if (x == 0) return 0;
+
+  return x * pow(x, y - 1);
+}
+
 lval* lval_num(long x) {
   lval* v = malloc(sizeof(lval));
   v->type = LVAL_NUM;
@@ -497,12 +504,13 @@ lval* builtin_op(lenv* e, lval* a, char* op) {
   }
   
   lval* x = lval_pop(a, 0);
-  
+
   if ((strcmp(op, "-") == 0) && a->count == 0) { x->num = -x->num; }
   
   while (a->count > 0) {  
     lval* y = lval_pop(a, 0);
-    
+    if (strcmp(op, "%") == 0) { x->num = (int)x->num % (int)y->num; break; }
+    if (strcmp(op, "^") == 0) { x->num = pow((double)x->num, (double)y->num); break; }
     if (strcmp(op, "+") == 0) { x->num += y->num; }
     if (strcmp(op, "-") == 0) { x->num -= y->num; }
     if (strcmp(op, "*") == 0) { x->num *= y->num; }
@@ -526,6 +534,8 @@ lval* builtin_add(lenv* e, lval* a) { return builtin_op(e, a, "+"); }
 lval* builtin_sub(lenv* e, lval* a) { return builtin_op(e, a, "-"); }
 lval* builtin_mul(lenv* e, lval* a) { return builtin_op(e, a, "*"); }
 lval* builtin_div(lenv* e, lval* a) { return builtin_op(e, a, "/"); }
+lval* builtin_mod(lenv* e, lval* a) { return builtin_op(e, a, "%"); }
+lval* builtin_pow(lenv* e, lval* a) { return builtin_op(e, a, "^"); }
 
 lval* builtin_var(lenv* e, lval* a, char* func) {
   LASSERT_TYPE(func, a, 0, LVAL_QEXPR);
@@ -701,6 +711,8 @@ void lenv_add_builtins(lenv* e) {
   lenv_add_builtin(e, "-", builtin_sub);
   lenv_add_builtin(e, "*", builtin_mul);
   lenv_add_builtin(e, "/", builtin_div);
+  lenv_add_builtin(e, "%", builtin_mod);
+  lenv_add_builtin(e, "^", builtin_pow);
   
   /* Comparison Functions */
   lenv_add_builtin(e, "if", builtin_if);
@@ -877,8 +889,8 @@ int main(int argc, char** argv) {
   
   mpca_lang(MPCA_LANG_DEFAULT,
     "                                              \
-      number  : /-?[0-9]+/ ;                       \
-      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ; \
+      number  : /[+-]?(([0-9]*[.])?[0-9]+|[0-9]+([.][0-9]*)?)/ ;  \
+      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&%^]+/ ; \
       string  : /\"(\\\\.|[^\"])*\"/ ;             \
       comment : /;[^\\r\\n]*/ ;                    \
       sexpr   : '(' <expr>* ')' ;                  \
@@ -895,7 +907,7 @@ int main(int argc, char** argv) {
   /* Interactive Prompt */
   if (argc == 1) {
   
-    puts("Dagger Version 0.0.0.1.0");
+    puts("Dagger Version 0.0.0.1.1");
     puts("Press Ctrl+c to Exit\n");
   
     while (1) {
