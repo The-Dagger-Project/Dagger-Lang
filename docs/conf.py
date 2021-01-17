@@ -17,8 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Dagger Lang'
-copyright = '2021, Adam Salhi'
+project = 'The Dagger Language'
+copyright = '2021, The Dagger Project'
 author = 'Adam Salhi'
 
 # The full version, including alpha/beta/rc tags
