@@ -1,5 +1,5 @@
 # Dagger
-Dagger is a homoiconic, interpreted programming language designed to be fast and effective. It is written in C, based on Dagger, and uses the MPC library to parse through information.
+Dagger is a homoiconic, interpreted programming language designed to be fast and effective. It is written in C, based on Lisp, and uses the MPC library to parse through information.
 
 # Installation
 Currently, Dagger is available only as an interactive prompt (we're hoping to make it include external files in future commits). First of all, clone this repo:
