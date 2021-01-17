@@ -259,8 +259,7 @@ void lval_print_str(lval* v) {
   strcpy(escaped, v->str);
   /* Pass it through the escape function */
   escaped = mpcf_escape(escaped);
-  /* Print it between " characters */
-  printf("\"%s\"", escaped);
+  printf("%s", escaped);
   /* free the copied string */
   free(escaped);
 }
@@ -907,7 +906,7 @@ int main(int argc, char** argv) {
   /* Interactive Prompt */
   if (argc == 1) {
   
-    puts("Dagger Version 0.0.0.1.1");
+    puts("Dagger Version 0.0.0.1.2");
     puts("Press Ctrl+c to Exit\n");
   
     while (1) {
