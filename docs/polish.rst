@@ -16,4 +16,8 @@ becomes ::
 
     * 3 (+ 1 7)
 
-This notation is called Polish Notation.
+One more complex example ->  (8 + 7) + (6 - 5) / (8 * (9 + 1)) becomes ::
+
+    + (+ 8 7) (/ (- 6 5) (* 8 (+ 9 1)))
+
+Notice how you can use parentheses to isolate operations from one another.

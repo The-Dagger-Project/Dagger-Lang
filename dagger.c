@@ -595,7 +595,7 @@ lval* builtin_var(lenv* e, lval* a, char* func) {
     func, syms->count, a->count-1);
     
   for (int i = 0; i < syms->count; i++) {
-    if (strcmp(func, "def") == 0) { lenv_def(e, syms->cell[i], a->cell[i+1]); }
+    if (strcmp(func, "set") == 0) { lenv_def(e, syms->cell[i], a->cell[i+1]); }
     if (strcmp(func, "=")   == 0) { lenv_put(e, syms->cell[i], a->cell[i+1]); } 
   }
   
@@ -603,7 +603,7 @@ lval* builtin_var(lenv* e, lval* a, char* func) {
   return lval_sexpr();
 }
 
-lval* builtin_def(lenv* e, lval* a) { return builtin_var(e, a, "def"); }
+lval* builtin_def(lenv* e, lval* a) { return builtin_var(e, a, "set"); }
 lval* builtin_put(lenv* e, lval* a) { return builtin_var(e, a, "="); }
 
 lval* builtin_ord(lenv* e, lval* a, char* op) {
@@ -933,7 +933,7 @@ int main(int argc, char** argv) {
       number  : /[+-]?(([0-9]*[.])?[0-9]+|[0-9]+([.][0-9]*)?)/ ;  \
       symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&%^]+/ ; \
       string  : /\"(\\\\.|[^\"])*\"/ ;             \
-      comment : /;[^\\r\\n]*/ ;                    \
+      comment : /#[^\\r\\n]*/ ;                    \
       sexpr   : '(' <expr>* ')' ;                  \
       qexpr   : '{' <expr>* '}' ;                  \
       expr    : <number>  | <symbol> | <string>    \
@@ -948,7 +948,7 @@ int main(int argc, char** argv) {
   /* Interactive Prompt */
   if (argc == 1) {
   
-    puts("Dagger Version 0.0.0.1.3");
+    puts("Dagger Version 0.0.0.1.4");
     puts("Press Ctrl+c to Exit\n");
   
     while (1) {
