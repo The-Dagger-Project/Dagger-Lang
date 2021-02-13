@@ -1,0 +1,14 @@
+# Factorial of n program
+
+(load "std.dgr")
+
+(fun {factorial n} {
+    if (== n 0)
+        {1}
+        {* (n) (factorial (- (n) 1))}
+})
+
+(set {n} 0)
+(print "Enter n:")
+(= {n} (readint n))
+(print (factorial n))

@@ -1,0 +1,167 @@
+### 
+#### Key Values
+###
+
+(set {null} {})
+(set {true} 1)
+(set {false} 0)
+
+###
+#### Define Functions Easier
+###
+
+(set {fun} (\ {args body} {set (head args) (\ (tail args) body)}))
+
+###
+#### Logic Functions
+###
+
+(fun {not x} {- 0 x}) 
+(fun {or x y} {+ x y})
+(fun {and x y} {* x y})
+
+###
+#### Input (TODO)
+###
+
+(fun {input a} {= {a} (read a)})
+
+###
+#### List Ops
+###
+
+## First list item
+(fun {first l} { eval (head l) })
+
+## Second list item
+(fun {second l} { eval (head (tail l)) })
+
+## Third list item
+(fun {third l} { eval (head (tail (tail l))) })
+
+## Nth list item (starts from 0)
+(fun {nth n l} {
+    if (== n 0)
+        {first l}
+        {nth (- n 1) (tail l)}
+})
+
+## Unpack list
+(fun {unpack f l} {
+  eval (join (list f) l)
+})
+
+## Pack List
+(fun {pack f & xs} {f xs})
+
+## Curried and uncurried calling
+(set {curry} unpack)
+(set {uncurry} pack)
+
+## Last list item
+(fun {last l} {nth (- (len l) 1) l})
+
+## Drop N list items
+(fun {drop n l} {
+  if (== n 0)
+    {l}
+    {drop (- n 1) (tail l)}
+})
+
+## Perform many things in one sequence
+(fun {do & l} {
+  if (== l nil)
+    {nil}
+    {last l}
+})
+
+## List length
+(fun {len l} {
+  if (== l null)
+    {0}
+    {+ 1 (len (tail l))}
+})
+
+## Open new variable scope
+(fun {let b} {
+  ((\ {_} b) ())
+})
+
+## Take n list items
+(fun {take n l} {
+  if (== n 0)
+    {nil}
+    {join (head l) (take (- n 1) (tail l))}
+})
+
+## Apply Function to List
+(fun {map f l} {
+  if (== l nil)
+    {nil}
+    {join (list (f (fst l))) (map f (tail l))}
+})
+
+## Split list at N
+(fun {split n l} {list (take n l) (drop n l)})
+
+## Check if element is in list
+(fun {elem x l} {
+    if (== l null)
+        {false}
+        {if (== x (first l)) 
+            {true} 
+            {elem x (tail l)}}
+})
+
+## Filter list
+(fun {filter f l} {
+  if (== l nil)
+    {nil}
+    {join (if (f (fst l)) {head l} {nil}) (filter f (tail l))}
+})
+
+### 
+#### MiSC
+###
+
+(fun {flip f a b} {f b a})
+(fun {ghost & xs} {eval xs})
+(fun {comp f g x} {f (g x)})
+
+###
+#### Conditional Functions
+###
+
+(fun {select & cs} {
+  if (== cs nil)
+    {error "No Selection Found"}
+    {if (fst (fst cs)) {snd (fst cs)} {unpack select (tail cs)}}
+})
+
+## Default value for 'otherwise'
+(set {otherwise} true)
+
+## Print cardinal suffixes
+(fun {cardinal i} {
+  select
+    {(== i 0)  "st"}
+    {(== i 1)  "nd"}
+    {(== i 3)  "rd"}
+    {otherwise "th"}
+})
+
+## Similar to C switch
+(fun {case x & cs} {
+  if (== cs nil)
+    {error "No Case Found"}
+    {if (== x (first (first cs))) {second (first cs)} {
+      unpack case (join (list x) (tail cs))}}
+})
+
+## Fibonacci Function
+(fun {fib n} {
+  select
+    { (== n 0) 0 }
+    { (== n 1) 1 }
+    { otherwise (+ (fib (- n 1)) (fib (- n 2))) }
+})
