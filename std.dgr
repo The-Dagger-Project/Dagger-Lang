@@ -21,6 +21,12 @@
 (fun {and x y} {* x y})
 
 ###
+#### Input (TODO)
+###
+
+(fun {input a} {= {a} (read a)})
+
+###
 #### List Ops
 ###
 

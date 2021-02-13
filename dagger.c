@@ -659,6 +659,16 @@ lval* builtin_if(lenv* e, lval* a) {
 
 lval* lval_read(mpc_ast_t* t);
 
+lval* builtin_read(lenv* e, lval*a) {
+  LASSERT_NUM("read", a, 1);
+  LASSERT_TYPE("read", a, 0, LVAL_STR);
+
+  lval* temp = a;
+  scanf("%s", &*(temp->cell[0]->str));
+  a = temp;
+  return a;
+}
+
 lval* builtin_load(lenv* e, lval* a) {
   LASSERT_NUM("load", a, 1);
   LASSERT_TYPE("load", a, 0, LVAL_STR);
@@ -766,6 +776,7 @@ void lenv_add_builtins(lenv* e) {
   
   /* String Functions */
   lenv_add_builtin(e, "load",  builtin_load); 
+  lenv_add_builtin(e, "read", builtin_read);
   lenv_add_builtin(e, "error", builtin_error);
   lenv_add_builtin(e, "print", builtin_print);
 }
@@ -948,7 +959,7 @@ int main(int argc, char** argv) {
   /* Interactive Prompt */
   if (argc == 1) {
   
-    puts("Dagger Version 0.0.0.1.4");
+    puts("Dagger Version 0.0.0.1.5");
     puts("Press Ctrl+c to Exit\n");
   
     while (1) {
