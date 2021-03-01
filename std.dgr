@@ -21,10 +21,19 @@
 (fun {and x y} {* x y})
 
 ###
-#### Input (TODO)
+#### Loop
 ###
 
-(fun {input a} {= {a} (read a)})
+(fun {loop ini con inc body} {
+  (eval(body))
+  if (== con true)
+    {
+      (loop (eval{+ ini inc}) con inc body)
+    }
+    {
+
+    }
+})
 
 ###
 #### List Ops
@@ -70,8 +79,8 @@
 
 ## Perform many things in one sequence
 (fun {do & l} {
-  if (== l nil)
-    {nil}
+  if (== l null)
+    {null}
     {last l}
 })
 
@@ -90,14 +99,14 @@
 ## Take n list items
 (fun {take n l} {
   if (== n 0)
-    {nil}
+    {null}
     {join (head l) (take (- n 1) (tail l))}
 })
 
 ## Apply Function to List
 (fun {map f l} {
-  if (== l nil)
-    {nil}
+  if (== l null)
+    {null}
     {join (list (f (fst l))) (map f (tail l))}
 })
 
@@ -115,9 +124,9 @@
 
 ## Filter list
 (fun {filter f l} {
-  if (== l nil)
-    {nil}
-    {join (if (f (fst l)) {head l} {nil}) (filter f (tail l))}
+  if (== l null)
+    {null}
+    {join (if (f (fst l)) {head l} {null}) (filter f (tail l))}
 })
 
 ### 
@@ -133,7 +142,7 @@
 ###
 
 (fun {select & cs} {
-  if (== cs nil)
+  if (== cs null)
     {error "No Selection Found"}
     {if (fst (fst cs)) {snd (fst cs)} {unpack select (tail cs)}}
 })
@@ -152,7 +161,7 @@
 
 ## Similar to C switch
 (fun {case x & cs} {
-  if (== cs nil)
+  if (== cs null)
     {error "No Case Found"}
     {if (== x (first (first cs))) {second (first cs)} {
       unpack case (join (list x) (tail cs))}}

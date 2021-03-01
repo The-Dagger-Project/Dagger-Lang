@@ -1,15 +1,24 @@
 # This program add the first n natural numbers to prove that we can indeed use recursion 
 # instead of loops.
 
+
+# Use the standard library
 (load "std.dgr")
 
+# Declare a sum_n function that takes n as a parameter
 (fun {sum_n n} {
     if (== n 1)
+        # If n = 1, return n
         {n}
+        # Else return n + sum_n(n - 1)
         {+ (n) (sum_n (- (n) 1))}
 })
 
+# Initialize variable
 (set {n} 0)
+# Prompt user for input
 (print "Enter n:")
+# Input a number
 (= {n} (readint n))
+# Print sum of first n integers
 (print (sum_n n))
