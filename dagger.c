@@ -598,7 +598,7 @@ lval* builtin_op(lenv* e, lval* a, char* op) {
       if (strcmp(op, "-") == 0) { x->dec -= y->dec; }
       if (strcmp(op, "*") == 0) { x->dec *= y->dec; }
       if (strcmp(op, "/") == 0) {
-        if (y->num == 0) {
+        if (y->dec == 0) {
           lval_del(x); lval_del(y);
           x = lval_err("Division by Zero!"); break;
         }
@@ -780,6 +780,8 @@ lval* builtin_load(lenv* e, lval* a) {
   }
 }
 
+lval* builtin_loop(lenv* e, lval* a);
+
 lval* builtin_print(lenv* e, lval* a) {
   
   /* Print each argument followed by a space */
@@ -819,6 +821,9 @@ void lenv_add_builtins(lenv* e) {
   lenv_add_builtin(e, "set", builtin_def);
   lenv_add_builtin(e, "=",   builtin_put);
   
+  /* Loop Functions */
+  lenv_add_builtin(e, "loop", builtin_loop);
+
   /* List Functions */
   lenv_add_builtin(e, "list", builtin_list);
   lenv_add_builtin(e, "head", builtin_head);
@@ -1004,6 +1009,21 @@ lval* lval_read(mpc_ast_t* t) {
   return x;
 }
 
+lval* builtin_loop(lenv* e, lval* a) {
+  LASSERT_NUM("loop", a, 4);
+  LASSERT_TYPE("loop", a, 0, LVAL_LONG);
+  LASSERT_TYPE("loop", a, 1, LVAL_LONG);
+  LASSERT_TYPE("loop", a, 2, LVAL_LONG);
+  LASSERT_TYPE("loop", a, 3, LVAL_QEXPR);
+
+  for (int init = a->cell[0]->num; a->cell[1] == 1; init += a->cell[2]->num) {
+    builtin_eval(e, a->cell[3]);
+  }
+
+  return lval_sexpr();
+}
+
+
 /* Main */
 
 int main(int argc, char** argv) {
@@ -1037,7 +1057,7 @@ int main(int argc, char** argv) {
   /* Interactive Prompt */
   if (argc == 1) {
   
-    puts("Dagger Version 0.0.0.2.0");
+    puts("Dagger Version 0.0.0.2.1");
     puts("Press Ctrl+c to Exit\n");
   
     while (1) {
