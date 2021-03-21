@@ -1,6 +1,4 @@
 # Dagger
-[![Documentation Status](https://readthedocs.org/projects/dagger-lang/badge/?version=latest)](https://dagger-lang.readthedocs.io/en/latest/?badge=latest)
-
 Dagger is a homoiconic, interpreted programming language designed to be fast and effective. It is written in C, based on Lisp, and uses the MPC library to parse through information.
 
 # Installation
@@ -25,4 +23,4 @@ Enjoy!
 Please see our Github Repo's issues page;
 
 # Complete Documentation
-Please see [our website](https://the-dagger-project.github.io/dagger-lang.html)
+Please see [our website](https://the-dagger-project.github.io/pages/dagger-lang-docs.html)
